@@ -1,6 +1,6 @@
 Package: drauger-upgrade-script
-Version: 0.1.0
-Maintainer: Thomas Castleman <contact@draugeros.org>
+Version: 0.2.1
+Maintainer: Thomas Castleman <batcastle@draugeros.org>
 Section: admin
 Architecture: all
 Priority: optional
