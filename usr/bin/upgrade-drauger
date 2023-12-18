@@ -143,6 +143,7 @@ cd /tmp
 	exit 1
 }
 new_ver=$(echo "$(lsb_release -rs) + 0.1" | bc)
+cd os-upgrade-scripts
 if [[ ! -d "$new_ver" ]]; then
 	# No upgrade script found. Notify user and exit after cleanup
 	no_script_notice
