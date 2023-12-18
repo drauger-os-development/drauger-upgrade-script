@@ -1,0 +1,188 @@
+#!/bin/bash
+# -*- coding: utf-8 -*-
+#
+#  upgrade-drauger
+#  
+#  Copyright 2023 Thomas Castleman <batcastle@draugeros.org>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#  
+#
+set -Ee
+set -o pipefail
+
+if [ "$UID" == "0" ]; then
+	echo -e "Please do not run this script as root.\nInstead, run it normally, allow it to request root access as needed." 1>&2
+	exit 2
+fi
+
+function BOLD ()
+{
+	echo "\033[1m"
+}
+
+function RESET ()
+{
+	echo "\033[0m"
+}
+
+# check we are running in a TTY so the screen doesn't time out
+if [ "$XDG_SESSION_TYPE" != "tty" ]; then
+	echo -e "Please run this script in a TTY to prevent your display from turning off.
+
+You can get to a TTY by pressing:
+
+\tCTRL + ALT + F2
+
+You should then get a prompt to login. Provide your username and password, re-run this script, and you should be good to go!
+
+You can get back to your graphical environment with:
+
+\tCTRL + ALT + F7
+
+Or, simply restart after the upgrade is complete by running:
+
+\tsudo reboot"
+	exit 1
+fi
+
+old_version=$(lsb_release -ds)
+
+function timer ()
+{
+	count=$1
+	while [[ $count -gt 0 ]]; do
+		printf "\r$2 Continuing in %s seconds..." "$count"
+		sleep 1s
+		count=$((count - 1))
+	done
+}
+
+function cleanup ()
+{
+	timer 4 "Performing Cleanup."
+	cd /tmp
+	echo ""
+	if [[ -d os-upgrade-scripts ]]; then
+		rm -rfv os-upgrade-scripts
+		echo "Cleanup complete!"
+	else
+		echo "Nothing to clean up..."
+	fi
+}
+
+function no_script_notice ()
+{
+	echo "
+			### NOTICE ###
+
+It does not appear that any upgrade script exists to upgrade Drauger OS $(lsb_release -rs) to Drauger OS $new_ver.
+If this is a mistake, please report it to the developers.
+
+			##############
+"
+	sleep 5s
+}
+
+# save a bit of space with this function
+function autopurge ()
+{
+	sudo apt-get -o Dpkg::Options::="--force-confold" --force-yes -y autopurge
+}
+
+echo -e "
+            ### WARNING ###
+You are about to attempt to upgrade your Drauger OS installation.
+This process takes several minutes, and REQUIRES an internet connection.
+
+Please be sure you are connected to the internet at this time.
+
+Upgrading OS versions is inherently a risky procedure. $(BOLD)Any loss of data is entirely at the fault of the user. You have been warned.$(RESET)
+Please take this time to ensure any important files are backed up to a separate drive such as a flash drive or external hard drive.
+
+Once this process has started, it should not be stopped, and is irreversible without the usage of a tool such as BTRFS snapshots.
+
+"
+# visible count down until allow to proceed
+timer 20 "If you haven't already, please make sure you read the above statment."
+# newline for seperation
+echo ""
+while true; do
+	read -p "Are you sure you want to continue? [yes/NO]: " ans
+	if [ "${ans,,}" == "no" ]; then
+		echo "Aborting Upgrade . . ."
+		exit
+	elif [ "${ans,,}" == "yes" ]; then
+		break
+	else
+		echo "Please answer with either 'yes' or 'no'."
+	fi	
+done
+echo "OBTAINING ROOT PRIVLEGES"
+sudo echo "ROOT PRIVLEGES OBTAINED"
+
+# CHECK FOR UPGRADE ARCHIVE
+cd /tmp
+{
+	git clone https://github.com/drauger-os-development/os-upgrade-scripts
+} || {
+	no_script_notice
+	exit 1
+}
+new_ver=$(echo "$(lsb_release -rs) + 0.1" | bc)
+if [[ ! -d "$new_ver" ]]; then
+	# No upgrade script found. Notify user and exit after cleanup
+	no_script_notice
+	cleanup
+	exit 1
+fi
+
+if [[ ! -f "$new_ver/entry_point.sh" ]]; then
+	# No upgrade script found. Notify user and exit after cleanup
+	no_script_notice
+	cleanup
+	exit 1
+fi
+
+# EXECUTE UPGRADE SCRIPT
+cd "$new_ver"
+eval "$(cat entry_point.sh)"
+{
+	disclosure
+} || {
+	state="$?"
+	# If 1: No cause for alarm. None of the disclosures apply to this user
+	# If 2: User declined enforced changes. They will not be upgraded
+	if [[ "$state" == "2" ]]; then
+		echo -e "$(BOLD)ENFORCED CHANGES DECLINED. CLEANING UP AND EXITING WITHOUT MAKING ANY CHANGES...$(RESET)"
+		cleanup
+		exit 1
+	fi
+}
+main
+
+echo "
+
+			### Congratulations! ###
+
+You have just upgraded from $old_version to $(lsb_release -ds)!
+All you have to do now is restart and your system will be completely up-to-date and ready to go!
+If you have any issues, please contact support on our Discord server or Telegram groups. Links to both are available in the footer of our website: https://draugeros.org
+
+Please note: PPAs WHERE NOT UPDATED. This MUST be handled manually.
+
+Thank you for using Drauger OS!
+"
