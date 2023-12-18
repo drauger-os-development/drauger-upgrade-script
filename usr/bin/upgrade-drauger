@@ -117,7 +117,9 @@ Once this process has started, it should not be stopped, and is irreversible wit
 
 "
 # visible count down until allow to proceed
-timer 20 "If you haven't already, please make sure you read the above statment."
+if [[ "$1" != "--bypass-warning" ]]; then
+	timer 20 "If you haven't already, please make sure you read the above statment."
+fi
 # newline for seperation
 echo ""
 while true; do
@@ -139,8 +141,14 @@ cd /tmp
 {
 	git clone https://github.com/drauger-os-development/os-upgrade-scripts
 } || {
-	no_script_notice
-	exit 1
+	if [[ -d os-upgrade-scripts ]]; then
+		cd os-upgrade-scripts
+		git pull
+		cd ..
+	else
+		no_script_notice
+		exit 1
+	fi
 }
 new_ver=$(echo "$(lsb_release -rs) + 0.1" | bc)
 cd os-upgrade-scripts
