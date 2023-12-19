@@ -182,7 +182,7 @@ eval "$(cat entry_point.sh)"
 	fi
 }
 main
-
+cleanup
 echo "
 
 			### Congratulations! ###
