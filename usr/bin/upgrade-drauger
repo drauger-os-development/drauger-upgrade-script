@@ -103,6 +103,22 @@ function autopurge ()
 	sudo apt-get -o Dpkg::Options::="--force-confold" --force-yes -y autopurge
 }
 
+function confirmation ()
+{
+	while true; do
+		read -p "Are you sure you want to continue? [yes/NO]: " ans
+		if [ "${ans,,}" == "no" ]; then
+			echo "Aborting Upgrade . . ."
+			return 1
+		elif [ "${ans,,}" == "yes" ]; then
+			break
+		else
+			echo "Please answer with either 'yes' or 'no'."
+		fi
+	done
+	return 0
+}
+
 echo -e "
             ### WARNING ###
 You are about to attempt to upgrade your Drauger OS installation.
@@ -122,17 +138,10 @@ if [[ "$1" != "--bypass-warning" ]]; then
 fi
 # newline for seperation
 echo ""
-while true; do
-	read -p "Are you sure you want to continue? [yes/NO]: " ans
-	if [ "${ans,,}" == "no" ]; then
-		echo "Aborting Upgrade . . ."
-		exit
-	elif [ "${ans,,}" == "yes" ]; then
-		break
-	else
-		echo "Please answer with either 'yes' or 'no'."
-	fi	
-done
+confirmation
+if [[ "$?" == "1" ]]; then
+	exit 1
+fi
 echo "OBTAINING ROOT PRIVLEGES"
 sudo echo "ROOT PRIVLEGES OBTAINED"
 
