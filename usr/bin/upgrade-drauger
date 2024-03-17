@@ -118,6 +118,28 @@ function confirmation ()
 	return 0
 }
 
+function obtain_root ()
+{
+	echo "OBTAINING ROOT PRIVLEGES" 1>&2
+	while true; do
+		read -srp "Root Password: " pass
+		{
+			echo "$pass" | sudo -S 1>/dev/null 2>/dev/null echo ""
+		} && {
+			echo -e "\nROOT PRIVLEGES OBTAINED" 1>&2
+			echo "$pass"
+			return
+		} || {
+			echo -e "\nIncorrect Password." 1>&2
+		}
+	done
+}
+
+function root ()
+{
+	echo "$pass" | sudo -S $*
+}
+
 echo -e "
             ### WARNING ###
 You are about to attempt to upgrade your Drauger OS installation.
@@ -141,8 +163,7 @@ confirmation
 if [[ "$?" == "1" ]]; then
 	exit 1
 fi
-echo "OBTAINING ROOT PRIVLEGES"
-sudo echo "ROOT PRIVLEGES OBTAINED"
+pass=$(obtain_root)
 
 # CHECK FOR UPGRADE ARCHIVE
 cd /tmp
@@ -206,3 +227,4 @@ Please note: PPAs WHERE NOT UPDATED. This MUST be handled manually.
 
 Thank you for using Drauger OS!
 "
+pass=""
