@@ -99,7 +99,7 @@ If this is a mistake, please report it to the developers.
 # save a bit of space with this function
 function autopurge ()
 {
-	sudo apt-get -o Dpkg::Options::="--force-confold" --force-yes -y autopurge
+	root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y autopurge
 }
 
 function confirmation ()
