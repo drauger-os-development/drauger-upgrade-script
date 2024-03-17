@@ -99,7 +99,7 @@ If this is a mistake, please report it to the developers.
 # save a bit of space with this function
 function autopurge ()
 {
-	root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y autopurge
+	DEBIAN_FRONTEND="noninteractive" root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y autopurge
 }
 
 function confirmation ()
@@ -137,7 +137,7 @@ function obtain_root ()
 
 function root ()
 {
-	echo "$pass" | sudo -S $*
+	echo "$pass" | sudo -SE $*
 }
 
 echo -e "
