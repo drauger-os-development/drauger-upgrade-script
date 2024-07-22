@@ -215,6 +215,9 @@ mandatory_changes
 major_changes
 autopurge
 cleanup
+# Run this one more time to ensure everything went smoothly and everything got upgraded
+root apt-get update
+root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y upgrade
 echo "
 
 			### Congratulations! ###
@@ -227,4 +230,9 @@ Please note: PPAs WHERE NOT UPDATED. This MUST be handled manually.
 
 Thank you for using Drauger OS!
 "
+echo -e "\n\n\nPreparing to reboot..."
+confirmation
+if [[ "$?" == "0" ]]; then
+	root reboot
+fi
 pass=""
