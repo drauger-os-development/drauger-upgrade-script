@@ -61,4 +61,4 @@ cd ..
 dpkg-deb --build "$FOLDER"
 rm -rf "$FOLDER"
 mkdir -p "$base/build"
-cp -v "$FOLDER.deb" "$base/build"
+mv -v "$FOLDER.deb" "$base/build"
