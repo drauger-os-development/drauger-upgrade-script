@@ -53,9 +53,12 @@ if [ -d opt ]; then
 fi
 
 cp -R DEBIAN ../"$FOLDER"/DEBIAN
+base=$PWD
 cd ..
 #DELETE STUFF HERE
 #build the shit
 #build config
 dpkg-deb --build "$FOLDER"
 rm -rf "$FOLDER"
+mkdir -p "$base/build"
+mv -v "$FOLDER.deb" "$base/build"

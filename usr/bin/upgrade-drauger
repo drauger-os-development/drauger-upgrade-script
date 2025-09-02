@@ -186,6 +186,14 @@ if [[ ! -d "$new_ver" ]]; then
 	no_script_notice "$new_ver"
 	cleanup
 	exit 1
+else
+	if [ -f "$new_ver/disabled.flag" ]; then
+		if $(echo "$*" | grep -qv "--override-disable-flag"); then
+			no_script_notice "$new_ver"
+			cleanup
+			exit 1
+		fi
+	fi
 fi
 
 if [[ ! -f "$new_ver/entry_point.sh" ]]; then
