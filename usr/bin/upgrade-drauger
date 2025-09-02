@@ -3,7 +3,7 @@
 #
 #  upgrade-drauger
 #
-#  Copyright 2024 Thomas Castleman <batcastle@draugeros.org>
+#  Copyright 2025 Thomas Castleman <batcastle@draugeros.org>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -193,6 +193,13 @@ if [[ ! -f "$new_ver/entry_point.sh" ]]; then
 	no_script_notice "$new_ver"
 	cleanup
 	exit 1
+elif [[ -f "$new_ver/disabled.flag" ]]; then
+	if $(echo "$*" | grep -qv "--override-disabled-flag"); then
+		# No upgrade script found. Notify user and exit after cleanup
+		no_script_notice "$new_ver"
+		cleanup
+		exit 1
+	fi
 fi
 
 # EXECUTE UPGRADE SCRIPT
