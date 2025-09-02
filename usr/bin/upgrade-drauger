@@ -201,13 +201,6 @@ if [[ ! -f "$new_ver/entry_point.sh" ]]; then
 	no_script_notice "$new_ver"
 	cleanup
 	exit 1
-elif [[ -f "$new_ver/disabled.flag" ]]; then
-	if $(echo "$*" | grep -qv "--override-disabled-flag"); then
-		# No upgrade script found. Notify user and exit after cleanup
-		no_script_notice "$new_ver"
-		cleanup
-		exit 1
-	fi
 fi
 
 # EXECUTE UPGRADE SCRIPT
