@@ -1,5 +1,5 @@
 Package: drauger-upgrade-script
-Version: 0.2.9
+Version: 0.3.0
 Maintainer: Thomas Castleman <batcastle@draugeros.org>
 Section: admin
 Architecture: all

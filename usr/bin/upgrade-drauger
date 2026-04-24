@@ -24,7 +24,7 @@
 set -Ee
 set -o pipefail
 
-VERSION="0.2.9"
+VERSION="0.3.0"
 HELP="drauger-upgrade-script, Version $VERSION
 
     -h, --help        Print this help dialog and exit
@@ -34,7 +34,7 @@ HELP="drauger-upgrade-script, Version $VERSION
 if $(echo "$*" | grep -q '\-h') || $(echo "$*" | grep -q '\-\-help'); then
         echo "$HELP"
         exit
-elif $(echo "$*" | grep -q '\v') || $(echo "$*" | grep -q '\-\-version'); then
+elif $(echo "$*" | grep -q '\-v') || $(echo "$*" | grep -q '\-\-version'); then
         echo "$VERSION"
         exit
 fi
