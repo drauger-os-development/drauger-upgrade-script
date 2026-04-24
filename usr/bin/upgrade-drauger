@@ -24,17 +24,19 @@
 set -Ee
 set -o pipefail
 
-VERSION="0.3.0"
+VERSION="0.3.1"
 HELP="drauger-upgrade-script, Version $VERSION
 
-    -h, --help        Print this help dialog and exit
-    -v, --version     Print current version and exit
+	-b, --bypass-warning          Bypass warning timeout. Warning will still print.
+    -h, --help                    Print this help dialog and exit
+    -o, --override-disable-flag   Override disable flag for upgrades still under development (DANGER)
+    -v, --version                 Print current version and exit
 "
 
-if $(echo "$*" | grep -q '\-h') || $(echo "$*" | grep -q '\-\-help'); then
+if $(echo "$*" | grep -q '\-\-help') || $(echo "$*" | grep -q '\-h'); then
         echo "$HELP"
         exit
-elif $(echo "$*" | grep -q '\-v') || $(echo "$*" | grep -q '\-\-version'); then
+elif $(echo "$*" | grep -q '\-\-version') || $(echo "$*" | grep -q '\-v'); then
         echo "$VERSION"
         exit
 fi
@@ -60,13 +62,17 @@ if [ "$XDG_SESSION_TYPE" != "tty" ]; then
 
 You can get to a TTY by pressing:
 
-\tCTRL + ALT + F2
+\tCTRL + ALT + F4
 
 You should then get a prompt to login. Provide your username and password, re-run this script, and you should be good to go!
 
 You can get back to your graphical environment with:
 
-\tCTRL + ALT + F7
+\tCTRL + ALT + F7 (if using X11)
+
+or
+
+\tCTRL + ALT + F2 (if using Wayland)
 
 Or, simply restart after the upgrade is complete by running:
 
@@ -169,7 +175,7 @@ Once this process has started, it should not be stopped, and is irreversible wit
 
 "
 # visible count down until allow to proceed
-if [[ "$1" != "--bypass-warning" ]]; then
+if $(echo "$*" | grep -qv '\-\-bypass\-warning') || $(echo "$*" | grep -qv '\-b'); then
 	timer 20 "If you haven't already, please make sure you read the above statment."
 fi
 # newline for seperation
@@ -203,7 +209,7 @@ if [[ ! -d "$new_ver" ]]; then
 	exit 1
 else
 	if [[ -f "$new_ver/disabled.flag" ]]; then
-		if $(echo "$*" | grep -qv '\-\-override\-disable\-flag'); then
+		if $(echo "$*" | grep -qv '\-\-override\-disable\-flag') || $(echo "$*" | grep -qv '\-o'); then
 			no_script_notice "$new_ver"
 			cleanup
 			exit 1
@@ -233,7 +239,7 @@ echo "
 cd "$new_ver"
 eval "$(cat entry_point.sh)"
 
-sleep 5s
+sleep 7s
 
 
 {
