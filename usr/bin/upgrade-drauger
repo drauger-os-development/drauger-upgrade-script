@@ -218,9 +218,24 @@ if [[ ! -f "$new_ver/entry_point.sh" ]]; then
 	exit 1
 fi
 
+echo "
+
+                ###    STARTING UPGRADE NOW!    ###
+
+    PLEASE DO NOT SHUT DOWN YOUR COMPUTER DURING THE UPGRADE PROCESS.
+
+    The upgrade may take some time. Please be patient with it,
+    especially if you have a lower end system.
+
+"
+
 # EXECUTE UPGRADE SCRIPT
 cd "$new_ver"
 eval "$(cat entry_point.sh)"
+
+sleep 5s
+
+
 {
 	disclosure
 } || {
