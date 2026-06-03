@@ -24,7 +24,7 @@
 set -Ee
 set -o pipefail
 
-VERSION="0.3.1"
+VERSION="0.3.2"
 HELP="drauger-upgrade-script, Version $VERSION
 
 	-b, --bypass-warning          Bypass warning timeout. Warning will still print.
@@ -261,7 +261,7 @@ autopurge
 cleanup
 # Run this one more time to ensure everything went smoothly and everything got upgraded
 root apt-get update
-root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y upgrade
+DEBIAN_FRONTEND="noninteractive" root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y upgrade
 echo "
 
 			### Congratulations! ###
