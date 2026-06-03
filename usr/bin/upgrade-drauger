@@ -254,6 +254,9 @@ sleep 7s
 		exit 1
 	fi
 }
+echo -e "\t\t\t###\tSTARTING BASIC INITAL UPGRADE\t###"
+root apt-get update
+DEBIAN_FRONTEND="noninteractive" root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y upgrade
 main
 mandatory_changes
 major_changes
