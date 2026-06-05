@@ -1,10 +1,10 @@
 Package: drauger-upgrade-script
-Version: 0.3.2
+Version: 0.3.3
 Maintainer: Thomas Castleman <batcastle@draugeros.org>
 Section: admin
 Architecture: all
 Priority: optional
-Depends: bash
+Depends: bash, ubuntu-release-upgrader-core
 Description: Upgrade Drauger OS to new versions
  Upgrade Drauger OS to the next release by simply running `upgrade-drauger'
 
