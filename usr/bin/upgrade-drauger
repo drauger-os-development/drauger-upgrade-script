@@ -24,7 +24,7 @@
 set -Ee
 set -o pipefail
 
-VERSION="0.3.5"
+VERSION="0.3.6"
 HELP="drauger-upgrade-script, Version $VERSION
 
 	-b, --bypass-warning          Bypass warning timeout. Warning will still print.
@@ -95,7 +95,11 @@ function timer ()
 function cleanup ()
 {
 	timer 4 "Performing Cleanup."
-	root apt clean
+	root apt-get clean
+	# remove edamame if still installed
+	if $(dpkg -l | grep -q "^ii edamame-common"); then
+		DEBIAN_FRONTEND="noninteractive" root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y purge edamame-common
+	fi
 	cd /tmp
 	echo ""
 	if [[ -d os-upgrade-scripts ]]; then
@@ -189,16 +193,16 @@ pass=$(obtain_root)
 # CHECK FOR UPGRADE ARCHIVE
 cd /tmp
 {
-	git clone https://github.com/drauger-os-development/os-upgrade-scripts
-} || {
-	if [[ -d os-upgrade-scripts ]]; then
+	if [ ! -d os-upgrade-scripts ]; then
+		git clone https://github.com/drauger-os-development/os-upgrade-scripts
+	else
 		cd os-upgrade-scripts
 		git pull
 		cd ..
-	else
-		no_script_notice
-		exit 1
 	fi
+} || {
+	no_script_notice
+	exit 1
 }
 new_ver=$(echo "$(lsb_release -rs) + 0.1" | bc)
 cd os-upgrade-scripts
