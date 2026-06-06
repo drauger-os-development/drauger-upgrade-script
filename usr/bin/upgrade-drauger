@@ -24,7 +24,7 @@
 set -Ee
 set -o pipefail
 
-VERSION="0.3.3"
+VERSION="0.3.4"
 HELP="drauger-upgrade-script, Version $VERSION
 
 	-b, --bypass-warning          Bypass warning timeout. Warning will still print.
@@ -95,7 +95,7 @@ function timer ()
 function cleanup ()
 {
 	timer 4 "Performing Cleanup."
-	sudo apt autoclean
+	root apt clean
 	cd /tmp
 	echo ""
 	if [[ -d os-upgrade-scripts ]]; then
@@ -254,9 +254,9 @@ sleep 7s
 		exit 1
 	fi
 }
-echo -e "\t\t\t###\tSTARTING BASIC INITAL UPGRADE\t###"
-root apt-get update
-DEBIAN_FRONTEND="noninteractive" root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y upgrade
+# echo -e "\t\t\t###\tSTARTING BASIC INITAL UPGRADE\t###"
+# root apt-get update
+# DEBIAN_FRONTEND="noninteractive" root apt-get -o Dpkg::Options::="--force-confold" --force-yes -y upgrade
 main
 mandatory_changes
 major_changes
